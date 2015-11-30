@@ -270,7 +270,7 @@ void Engine::Step(bool isActive)
 	ai.UpdateEvents(events);
 	ai.UpdateKeys(player, isActive && wasActive);
 	wasActive = isActive;
-	Audio::Update(position, velocity);
+	Audio::Update(position);
 	
 	// Any of the player's ships that are in system are assumed to have
 	// landed along with the player.
@@ -753,7 +753,7 @@ void Engine::CalculateStep()
 	}
 	
 	if(!wasHyperspacing && flagship && flagship->IsEnteringHyperspace())
-		Audio::Play(Audio::Get(flagship->HyperspaceType() >= 200 ? "jump_drive" : "hyperspace"));
+		Audio::Play(Audio::Get(flagship->HyperspaceType() >= 200 ? "jump drive" : "hyperdrive"));
 	
 	// If the player has entered a new system, update the asteroids, etc.
 	if(wasHyperspacing && !flagship->IsEnteringHyperspace())
@@ -1049,8 +1049,9 @@ void Engine::CalculateStep()
 		}
 		else if(projectile.MissileStrength())
 		{
+			bool isEnemy = projectile.GetGovernment() && projectile.GetGovernment()->IsEnemy();
 			radar[calcTickTock].Add(
-				Radar::SPECIAL, projectile.Position() - center, 1.);
+				isEnemy ? Radar::SPECIAL : Radar::INACTIVE, projectile.Position() - center, 1.);
 			
 			// If the projectile did not hit anything, give the anti-missile
 			// systems a chance to shoot it down.
